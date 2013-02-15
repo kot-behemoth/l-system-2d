@@ -42,7 +42,7 @@ class Turtle < Chingu::GameObject
 		super
 		@x = $window.width / 2.0
 		@y = $window.height / 2.0
-		@d = 10
+		@d = 300
 		@b = 90
 
 		@lsystem = LSystem.new 'F-F-F-F'
@@ -57,24 +57,22 @@ class Turtle < Chingu::GameObject
 				# segment between points (x, y)and (x',y') is drawn.
 				when 'F'
 					# move the turle
+					@previous_x = @x
+					@previous_y = @y
 					@x += Gosu.offset_x(@angle, @d)
 					@y += Gosu.offset_y(@angle, @d)
 
 					# then draw the path
-					# TexPlay::line previous_x, previous_y, @x, @y, :color => Color::WHITE
-					$window.draw_line( previous_x, previous_y, Color::WHITE, @x, @y, Color::WHITE )
-					# puts "Did F"
+					$window.draw_line( @previous_x, @previous_y, Color::WHITE, @x, @y, Color::WHITE )
 
 				# Turn left by angle δ. The next state of the turtle is (x, y,α+δ). The
 				# positive orientation of angles is counter-clockwise.
 				when '+'
 					@angle += @b
-					# puts "Did +"
 
 				# Turn right by angle δ. The next state of the turtle is (x, y,α−δ).
 				when '-'
 					@angle -= @b
-					# puts "Did -"
 
 				else
 					raise "Unknown string symbol encountered!"
@@ -93,6 +91,7 @@ class Turtle < Chingu::GameObject
 
 	def next_iteration
 		@lsystem.next_iteration
+		@d /= 4.0
 		# puts @lsystem.current_string
 	end
 
@@ -101,7 +100,7 @@ end
 class Game < Chingu::Window
 
 	def initialize
-		super 640, 480, false
+		super 800, 800, false
 		self.input = { :esc => :exit }
 
 		@turle = Turtle.create
