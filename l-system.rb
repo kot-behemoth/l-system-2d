@@ -14,6 +14,11 @@ class LSystem
 		@iteration = 0
 	end
 
+	def reset
+		@current_string = @input_string
+		@iteration = 0
+	end
+
 	def next_iteration
 		tmp_string = ''
 		@current_string.each_char do |c|
@@ -32,7 +37,6 @@ class LSystem
 end
 
 class Turtle < Chingu::GameObject
-	trait :velocity # mainly for previous_x, previous_y
 	# d - step size
 	# b - angle increment
 	attr_reader :d, :b
@@ -40,10 +44,11 @@ class Turtle < Chingu::GameObject
 
 	def setup
 		super
-		@x = $window.width / 2.0
-		@y = $window.height / 2.0
 		@d = 300
 		@b = 90
+		@origin_x = ($window.width - @d) / 2.0
+		@origin_y = ($window.height - @d) / 2.0
+		reset_state
 
 		@lsystem = LSystem.new 'F-F-F-F'
 	end
@@ -59,8 +64,8 @@ class Turtle < Chingu::GameObject
 					# move the turle
 					@previous_x = @x
 					@previous_y = @y
-					@x += Gosu.offset_x(@angle, @d)
-					@y += Gosu.offset_y(@angle, @d)
+					@x -= Gosu.offset_x(@angle, @d)
+					@y -= Gosu.offset_y(@angle, @d)
 
 					# then draw the path
 					$window.draw_line( @previous_x, @previous_y, Color::WHITE, @x, @y, Color::WHITE )
@@ -75,7 +80,7 @@ class Turtle < Chingu::GameObject
 					@angle -= @b
 
 				else
-					raise "Unknown string symbol encountered!"
+					raise 'Unknown string symbol encountered!'
 
 			end
 		end
@@ -83,9 +88,13 @@ class Turtle < Chingu::GameObject
 		reset_state
 	end
 
+	def reset_lsystem
+		@lsystem.reset_lsystem
+	end
+
 	def reset_state
-		@x = $window.width / 2.0
-		@y = $window.height / 2.0
+		@x = @origin_x
+		@y = @origin_y
 		@angle = 0
 	end
 
